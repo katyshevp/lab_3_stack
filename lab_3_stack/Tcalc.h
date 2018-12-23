@@ -1,12 +1,13 @@
 #include "tStack.h"
 #include <string>
+#include <iostream>
 
 using namespace std;
 
 class TCalculator
 {
-	string inf;
-	string post;
+
+	std::string inf, post;
 
 	TStack<char> Stop;
 	TStack<double> StrNum;
@@ -18,8 +19,22 @@ public:
 	int Prty(char c);
 	void ToPost();
 	double Calcucate();
+	bool CheckOperator();
+	bool CheckBrackets();
+	TCalculator();
+	~TCalculator();
+
 };
 
+TCalculator::TCalculator()
+{
+	inf = "\0";
+}
+
+
+TCalculator::~TCalculator()
+{
+}
 
 void TCalculator::SetInf(string str)
 {
@@ -45,9 +60,9 @@ int TCalculator::StCheck()
 			Stop.Pop();
 		}
 	}
-	if (Stop.IsEmpty()) 
+	if (Stop.IsEmpty())
 		return 1;
-	else 
+	else
 		return 0;
 }
 
@@ -55,15 +70,15 @@ int TCalculator::Prty(char c)
 {
 	switch (c)
 	{
-	case '(': 
+	case '(':
 		return 0;
 	case '+':
 		return 1;
 	case '-':
 		return 1;
-	case '*': 
+	case '*':
 		return 2;
-	case '/': 
+	case '/':
 		return 2;
 	case '^':
 		return 3;
@@ -122,15 +137,15 @@ double TCalculator::Calcucate()
 
 			switch (post[i])
 			{
-			case '+': res = op1 + op2; 
+			case '+': res = op1 + op2;
 				break;
-			case '-': res = op1 - op2; 
+			case '-': res = op1 - op2;
 				break;
-			case '*': res = op1 * op2; 
+			case '*': res = op1 * op2;
 				break;
 			case '/': res = op1 / op2;
 				break;
-			case '^': res = pow(op1, op2); 
+			case '^': res = pow(op1, op2);
 				break;
 			}
 			StrNum.Push(res);
@@ -147,4 +162,46 @@ double TCalculator::Calcucate()
 		}
 	}
 	return StrNum.Pop();
+}
+
+
+bool TCalculator::CheckOperator()
+{
+	if (inf == "")
+		throw "Error";
+	if (inf[0] == '+' || inf[0] == '-' || inf[0] == '*' || inf[0] == '/' || inf[0] == '^')
+		return false;
+	if (inf[inf.size() - 1] == '+' || inf[inf.size() - 1] == '-' || inf[inf.size() - 1] == '*'
+		|| inf[inf.size() - 1] == '/' || inf[inf.size() - 1] == '^')
+		return false;
+	for (int i = 0; i < inf.size() - 1; i++) {
+		if ((inf[i] == '+' || inf[i] == '-' || inf[i] == '*' || inf[i] == '/' || inf[i] == '^') &&
+			(inf[i + 1] == '+' || inf[i + 1] == '-' || inf[i + 1] == '*' || inf[i + 1] == '/' || inf[i + 1] == '^'))
+			return false;
+	}
+	return true;
+}
+
+bool TCalculator::CheckBrackets()
+{
+	TStack <char> bracket(inf.length());
+	if (inf == "")
+		throw 5;
+	else
+	{
+		for (int i = 0; i < inf.length(); i++)
+			if (inf[i] == '(')
+				bracket.Push(inf[i]);
+			else if (inf[i] == ')')
+			{
+				if (bracket.IsEmpty())
+					return false;
+				else
+					bracket.Pop();
+			}
+		if (bracket.IsEmpty())
+			return true;
+		else
+			return false;
+	}
 }
